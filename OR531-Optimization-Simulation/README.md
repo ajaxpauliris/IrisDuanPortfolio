@@ -21,10 +21,6 @@ The projects emphasized building mathematical models, solving them with analytic
 ## 📂 Repository Structure
 # OR 531 – Analytics and Modeling Projects
 
-## 📂 Repository Structure
-
-## OR531-Projects
-
 - **Project 5:**     Early decision analysis models (value functions, trade-offs)
 - **Project 7:**     Monte Carlo simulation of uncertain costs/yields
 - **Project 9:**     Optimization models for resource allocation
