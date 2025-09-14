@@ -1,6 +1,12 @@
 # CS504 – Indications of Recession
 
-This project analyzed early warning indicators of the 2008 financial crisis using economic data from FRED.
+This was a group project that analyzed early warning indicators of the 2008 financial crisis using economic data from FRED. 
+
+Group members included:
+- Iris Duan - Scrum Master
+- Brian Haggerty - Product Owner
+- Roger Graham - Developer
+- An Huynh - Developer
 
 ## 📌 Key Highlights
 - Built a Python data pipeline with `pandas` + `NumPy`.
