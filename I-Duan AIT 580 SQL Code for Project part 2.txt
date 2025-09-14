@@ -1,0 +1,526 @@
+-- Create table for loan origination data
+CREATE TABLE loan_origination (
+    credit_score INT,
+    first_payment_date DATE,
+    first_time_homebuyer_flag CHAR(1),
+    maturity_date DATE,
+    msa_code INT,
+    mortgage_insurance_pct DECIMAL(5,2),
+    number_of_units INT,
+    occupancy_status CHAR(1),
+    original_cltv DECIMAL(5,2),
+    original_dti DECIMAL(5,2),
+    original_upb DECIMAL(12,2),
+    original_ltv DECIMAL(5,2),
+    original_interest_rate DECIMAL(6,3),
+    channel CHAR(1),
+    prepayment_penalty_flag CHAR(1),
+    amortization_type CHAR(5),
+    property_state CHAR(2),
+    property_type CHAR(2),
+    postal_code CHAR(5),
+    loan_sequence_number VARCHAR(12) PRIMARY KEY,
+    loan_purpose CHAR(1),
+    original_loan_term INT,
+    number_of_borrowers INT,
+    seller_name VARCHAR(60),
+    servicer_name VARCHAR(60),
+    super_conforming_flag CHAR(1),
+    pre_relief_refinance_loan_sequence VARCHAR(12),
+    program_indicator CHAR(1),
+    relief_refinance_indicator CHAR(1),
+    property_valuation_method INT,
+    interest_only_indicator CHAR(1),
+    mi_cancellation_indicator CHAR(1),
+    quarter_year CHAR(6) -- Added to track quarter of the data
+);
+
+
+
+
+CREATE TABLE loan_performance (
+    loan_sequence_number VARCHAR(12),
+    monthly_reporting_period DATE,
+    current_actual_upb DECIMAL(12,2),
+    current_loan_delinquency_status CHAR(3),
+    loan_age INT,
+    remaining_months_to_legal_maturity INT,
+    defect_settlement_date DATE,
+    modification_flag CHAR(1),
+    zero_balance_code INT,  
+    zero_balance_effective_date DATE,
+    current_interest_rate DECIMAL(5,3),
+    current_non_interest_bearing_upb DECIMAL(12,2),
+    due_date_last_paid_installment DATE,
+    mi_recoveries DECIMAL(12,2),
+    net_sale_proceeds DECIMAL(12,2),  
+    non_mi_recoveries DECIMAL(12,2),
+    total_expenses DECIMAL(12,2),
+    legal_costs DECIMAL(12,2),
+    maintenance_preservation_costs DECIMAL(12,2),
+    taxes_and_insurance DECIMAL(12,2),
+    miscellaneous_expenses DECIMAL(12,2),
+    actual_loss_calculation DECIMAL(12,2),
+    cumulative_modification_cost DECIMAL(12,2),
+    step_modification_flag CHAR(1),
+    payment_deferral CHAR(1),
+    estimated_loan_to_value DECIMAL(5,2),
+    zero_balance_removal_upb DECIMAL(12,2),
+    delinquent_accrued_interest DECIMAL(12,2),
+    delinquency_due_to_disaster CHAR(1),
+    borrower_assistance_status_code CHAR(1),
+    current_month_modification_cost DECIMAL(12,2),
+    interest_bearing_upb DECIMAL(12,2),
+    quarter_year CHAR(6),  
+    FOREIGN KEY (loan_sequence_number) REFERENCES loan_origination(loan_sequence_number)
+);
+
+-- Load in Q1 2020 loan origination data to the created table
+COPY loan_origination
+FROM 'C:/Users/irisd/cleaned_historical_data_2020Q1.csv'
+DELIMITER ',' 
+CSV HEADER;
+
+-- Load in Q2 2020 loan origination data to the created table
+COPY loan_origination
+FROM 'C:/Users/irisd/cleaned_historical_data_2020Q2.csv'
+DELIMITER ',' 
+CSV HEADER;
+
+
+-- Load in Q3 2020 loan origination data to the created table
+COPY loan_origination
+FROM 'C:/Users/irisd/cleaned_historical_data_2020Q3.csv'
+DELIMITER ',' 
+CSV HEADER;
+
+-- Load in Q4 2020 loan origination data to the created table
+COPY loan_origination
+FROM 'C:/Users/irisd/cleaned_historical_data_2020Q4.csv'
+DELIMITER ',' 
+CSV HEADER;
+
+-- Load in Q1 2020 loan performance data to the created table
+COPY loan_performance
+FROM 'C:/Users/irisd/cleaned_historical_performance_2020Q1.csv'
+DELIMITER ',' 
+CSV HEADER;
+
+
+-- Load in Q2 2020 loan performance data to the created table
+COPY loan_performance
+FROM 'C:/Users/irisd/cleaned_historical_performance_2020Q2.csv'
+DELIMITER ',' 
+CSV HEADER;
+
+-- Load in Q3 2020 loan performance data to the created table
+COPY loan_performance
+FROM 'C:/Users/irisd/cleaned_historical_performance_2020Q3.csv'
+DELIMITER ',' 
+CSV HEADER;
+
+-- Load in Q4 2020 loan performance data to the created table
+COPY loan_performance
+FROM 'C:/Users/irisd/cleaned_historical_performance_2020Q4.csv'
+DELIMITER ',' 
+CSV HEADER;
+
+
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'loan_performance' AND column_name = 'loan_sequence_number';
+
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'loan_origination' AND column_name = 'loan_sequence_number';
+
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public';
+
+SELECT column_name 
+FROM information_schema.columns 
+WHERE table_name = 'loan_performance';
+
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'loan_performance' AND column_name = 'loan_sequence_number';
+
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'loan_origination' AND column_name = 'loan_sequence_number';
+
+ALTER TABLE loan_performance ALTER COLUMN loan_sequence_number TYPE VARCHAR(12);
+
+
+-- Part 2: Create a merged table and load data
+
+DROP TABLE IF EXISTS merged_loan_data;
+
+CREATE TABLE merged_loan_data (
+    original_dti DECIMAL(5,2),
+    original_upb DECIMAL(12,2),
+    original_loan_term INT,
+    number_of_borrowers INT,
+    original_ltv DECIMAL(5,2),
+    original_interest_rate DECIMAL(6,3),
+    maturity_date DATE,
+    msa_code INT,
+    mortgage_insurance_pct DECIMAL(5,2),
+    number_of_units INT,
+    property_valuation_method INT,
+    first_payment_date DATE,
+    original_cltv DECIMAL(5,2),
+    credit_score INT,
+    pre_relief_refinance_loan_sequence VARCHAR(12),
+    program_indicator CHAR(1),
+    relief_refinance_indicator CHAR(1),
+    interest_only_indicator CHAR(1),
+    mi_cancellation_indicator CHAR(1),
+    origination_quarter CHAR(6),
+    first_time_homebuyer_flag CHAR(1),
+    occupancy_status CHAR(1),
+    channel CHAR(1),
+    prepayment_penalty_flag CHAR(1),
+    amortization_type CHAR(5),
+    property_state CHAR(2),
+    property_type CHAR(2),
+    postal_code CHAR(5),
+    loan_sequence_number VARCHAR(12),
+    loan_purpose CHAR(1),
+    seller_name VARCHAR(60),
+    servicer_name VARCHAR(60),
+    super_conforming_flag CHAR(1),
+    estimated_loan_to_value DECIMAL(5,2),
+    zero_balance_removal_upb DECIMAL(12,2),
+    delinquent_accrued_interest DECIMAL(12,2),
+    remaining_months_to_legal_maturity INT,
+    defect_settlement_date DATE,
+    current_month_modification_cost DECIMAL(12,2),
+    interest_bearing_upb DECIMAL(12,2),
+    current_actual_upb DECIMAL(12,2),
+    zero_balance_code INT,
+    zero_balance_effective_date DATE,
+    current_interest_rate DECIMAL(6,3),
+    current_non_interest_bearing_upb DECIMAL(12,2),
+    due_date_last_paid_installment DATE,
+    mi_recoveries DECIMAL(12,2),
+    net_sale_proceeds DECIMAL(12,2),
+    non_mi_recoveries DECIMAL(12,2),
+    total_expenses DECIMAL(12,2),
+    legal_costs DECIMAL(12,2),
+    maintenance_preservation_costs DECIMAL(12,2),
+    taxes_and_insurance DECIMAL(12,2),
+    miscellaneous_expenses DECIMAL(12,2),
+    actual_loss_calculation DECIMAL(12,2),
+    cumulative_modification_cost DECIMAL(12,2),
+    monthly_reporting_period DATE,
+    loan_age INT,
+    performance_quarter CHAR(6),
+    current_loan_delinquency_status CHAR(3),
+    modification_flag CHAR(1),
+    step_modification_flag CHAR(1),
+    payment_deferral CHAR(1),
+    delinquency_due_to_disaster CHAR(1),
+    borrower_assistance_status_code CHAR(1)
+);
+
+-- Create index to speed up JOIN 
+CREATE INDEX idx_loan_seq_merged ON merged_loan_data(loan_sequence_number);
+CREATE INDEX idx_performance_quarter ON merged_loan_data(performance_quarter);
+CREATE INDEX idx_origination_quarter ON merged_loan_data(origination_quarter);
+
+
+-- Insert Q1 2020 Data (January - March) while keeping only the latest performance record per loan
+INSERT INTO merged_loan_data (
+    original_dti, original_upb, original_loan_term, number_of_borrowers,
+    original_ltv, original_interest_rate, maturity_date, msa_code,
+    mortgage_insurance_pct, number_of_units, property_valuation_method,
+    first_payment_date, original_cltv, credit_score,
+    pre_relief_refinance_loan_sequence, program_indicator, relief_refinance_indicator,
+    interest_only_indicator, mi_cancellation_indicator, origination_quarter,
+    first_time_homebuyer_flag, occupancy_status, channel, prepayment_penalty_flag,
+    amortization_type, property_state, property_type, postal_code, loan_sequence_number,
+    loan_purpose, seller_name, servicer_name, super_conforming_flag, 
+    estimated_loan_to_value, zero_balance_removal_upb, delinquent_accrued_interest,
+    remaining_months_to_legal_maturity, defect_settlement_date, current_month_modification_cost,
+    interest_bearing_upb, current_actual_upb, zero_balance_code, zero_balance_effective_date,
+    current_interest_rate, current_non_interest_bearing_upb, due_date_last_paid_installment,
+    mi_recoveries, net_sale_proceeds, non_mi_recoveries, total_expenses, legal_costs,
+    maintenance_preservation_costs, taxes_and_insurance, miscellaneous_expenses,
+    actual_loss_calculation, cumulative_modification_cost, monthly_reporting_period,
+    loan_age, performance_quarter, current_loan_delinquency_status,
+    modification_flag, step_modification_flag, payment_deferral, delinquency_due_to_disaster,
+    borrower_assistance_status_code
+)
+SELECT 
+    lo.original_dti, lo.original_upb, lo.original_loan_term, lo.number_of_borrowers,
+    lo.original_ltv, lo.original_interest_rate, lo.maturity_date, lo.msa_code,
+    lo.mortgage_insurance_pct, lo.number_of_units, lo.property_valuation_method,
+    lo.first_payment_date, lo.original_cltv, lo.credit_score,
+    lo.pre_relief_refinance_loan_sequence, lo.program_indicator, lo.relief_refinance_indicator,
+    lo.interest_only_indicator, lo.mi_cancellation_indicator, lo.quarter_year AS origination_quarter,
+    lo.first_time_homebuyer_flag, lo.occupancy_status, lo.channel, lo.prepayment_penalty_flag,
+    lo.amortization_type, lo.property_state, lo.property_type, lo.postal_code, lo.loan_sequence_number,
+    lo.loan_purpose, lo.seller_name, lo.servicer_name, lo.super_conforming_flag, 
+    lp.estimated_loan_to_value, lp.zero_balance_removal_upb, lp.delinquent_accrued_interest,
+    lp.remaining_months_to_legal_maturity, lp.defect_settlement_date, lp.current_month_modification_cost,
+    lp.interest_bearing_upb, lp.current_actual_upb, lp.zero_balance_code, lp.zero_balance_effective_date,
+    lp.current_interest_rate, lp.current_non_interest_bearing_upb, lp.due_date_last_paid_installment,
+    lp.mi_recoveries, lp.net_sale_proceeds, lp.non_mi_recoveries, lp.total_expenses, lp.legal_costs,
+    lp.maintenance_preservation_costs, lp.taxes_and_insurance, lp.miscellaneous_expenses,
+    lp.actual_loss_calculation, lp.cumulative_modification_cost, lp.monthly_reporting_period,
+    lp.loan_age, lp.quarter_year AS performance_quarter, lp.current_loan_delinquency_status,
+    lp.modification_flag, lp.step_modification_flag, lp.payment_deferral, lp.delinquency_due_to_disaster,
+    lp.borrower_assistance_status_code
+FROM public.loan_origination lo
+JOIN public.loan_performance lp  
+ON lo.loan_sequence_number = lp.loan_sequence_number
+WHERE lp.quarter_year = '2020Q1' 
+AND (lp.loan_sequence_number, lp.monthly_reporting_period) IN (
+    -- Select only the most recent monthly record per loan for Q1
+    SELECT loan_sequence_number, MAX(monthly_reporting_period)
+    FROM public.loan_performance
+    WHERE quarter_year = '2020Q1'
+    GROUP BY loan_sequence_number
+)
+ORDER BY lo.loan_sequence_number;
+
+
+-- ✅ Repeat for Q2 2020 (April - June)
+INSERT INTO merged_loan_data (
+    original_dti, original_upb, original_loan_term, number_of_borrowers,
+    original_ltv, original_interest_rate, maturity_date, msa_code,
+    mortgage_insurance_pct, number_of_units, property_valuation_method,
+    first_payment_date, original_cltv, credit_score,
+    pre_relief_refinance_loan_sequence, program_indicator, relief_refinance_indicator,
+    interest_only_indicator, mi_cancellation_indicator, origination_quarter,
+    first_time_homebuyer_flag, occupancy_status, channel, prepayment_penalty_flag,
+    amortization_type, property_state, property_type, postal_code, loan_sequence_number,
+    loan_purpose, seller_name, servicer_name, super_conforming_flag, 
+    estimated_loan_to_value, zero_balance_removal_upb, delinquent_accrued_interest,
+    remaining_months_to_legal_maturity, defect_settlement_date, current_month_modification_cost,
+    interest_bearing_upb, current_actual_upb, zero_balance_code, zero_balance_effective_date,
+    current_interest_rate, current_non_interest_bearing_upb, due_date_last_paid_installment,
+    mi_recoveries, net_sale_proceeds, non_mi_recoveries, total_expenses, legal_costs,
+    maintenance_preservation_costs, taxes_and_insurance, miscellaneous_expenses,
+    actual_loss_calculation, cumulative_modification_cost, monthly_reporting_period,
+    loan_age, performance_quarter, current_loan_delinquency_status,
+    modification_flag, step_modification_flag, payment_deferral, delinquency_due_to_disaster,
+    borrower_assistance_status_code
+)
+SELECT 
+    lo.original_dti, lo.original_upb, lo.original_loan_term, lo.number_of_borrowers,
+    lo.original_ltv, lo.original_interest_rate, lo.maturity_date, lo.msa_code,
+    lo.mortgage_insurance_pct, lo.number_of_units, lo.property_valuation_method,
+    lo.first_payment_date, lo.original_cltv, lo.credit_score,
+    lo.pre_relief_refinance_loan_sequence, lo.program_indicator, lo.relief_refinance_indicator,
+    lo.interest_only_indicator, lo.mi_cancellation_indicator, lo.quarter_year AS origination_quarter,
+    lo.first_time_homebuyer_flag, lo.occupancy_status, lo.channel, lo.prepayment_penalty_flag,
+    lo.amortization_type, lo.property_state, lo.property_type, lo.postal_code, lo.loan_sequence_number,
+    lo.loan_purpose, lo.seller_name, lo.servicer_name, lo.super_conforming_flag, 
+    lp.estimated_loan_to_value, lp.zero_balance_removal_upb, lp.delinquent_accrued_interest,
+    lp.remaining_months_to_legal_maturity, lp.defect_settlement_date, lp.current_month_modification_cost,
+    lp.interest_bearing_upb, lp.current_actual_upb, lp.zero_balance_code, lp.zero_balance_effective_date,
+    lp.current_interest_rate, lp.current_non_interest_bearing_upb, lp.due_date_last_paid_installment,
+    lp.mi_recoveries, lp.net_sale_proceeds, lp.non_mi_recoveries, lp.total_expenses, lp.legal_costs,
+    lp.maintenance_preservation_costs, lp.taxes_and_insurance, lp.miscellaneous_expenses,
+    lp.actual_loss_calculation, lp.cumulative_modification_cost, lp.monthly_reporting_period,
+    lp.loan_age, lp.quarter_year AS performance_quarter, lp.current_loan_delinquency_status,
+    lp.modification_flag, lp.step_modification_flag, lp.payment_deferral, lp.delinquency_due_to_disaster,
+    lp.borrower_assistance_status_code
+FROM public.loan_origination lo
+JOIN public.loan_performance lp  
+ON lo.loan_sequence_number = lp.loan_sequence_number
+WHERE lp.quarter_year = '2020Q2' 
+AND (lp.loan_sequence_number, lp.monthly_reporting_period) IN (
+    -- Select only the most recent monthly record per loan for Q2
+    SELECT loan_sequence_number, MAX(monthly_reporting_period)
+    FROM public.loan_performance
+    WHERE quarter_year = '2020Q2'
+    GROUP BY loan_sequence_number
+)
+ORDER BY lo.loan_sequence_number;
+
+
+-- ✅ Repeat for Q3 2020 (July - September)
+INSERT INTO merged_loan_data (
+    original_dti, original_upb, original_loan_term, number_of_borrowers,
+    original_ltv, original_interest_rate, maturity_date, msa_code,
+    mortgage_insurance_pct, number_of_units, property_valuation_method,
+    first_payment_date, original_cltv, credit_score,
+    pre_relief_refinance_loan_sequence, program_indicator, relief_refinance_indicator,
+    interest_only_indicator, mi_cancellation_indicator, origination_quarter,
+    first_time_homebuyer_flag, occupancy_status, channel, prepayment_penalty_flag,
+    amortization_type, property_state, property_type, postal_code, loan_sequence_number,
+    loan_purpose, seller_name, servicer_name, super_conforming_flag, 
+    estimated_loan_to_value, zero_balance_removal_upb, delinquent_accrued_interest,
+    remaining_months_to_legal_maturity, defect_settlement_date, current_month_modification_cost,
+    interest_bearing_upb, current_actual_upb, zero_balance_code, zero_balance_effective_date,
+    current_interest_rate, current_non_interest_bearing_upb, due_date_last_paid_installment,
+    mi_recoveries, net_sale_proceeds, non_mi_recoveries, total_expenses, legal_costs,
+    maintenance_preservation_costs, taxes_and_insurance, miscellaneous_expenses,
+    actual_loss_calculation, cumulative_modification_cost, monthly_reporting_period,
+    loan_age, performance_quarter, current_loan_delinquency_status,
+    modification_flag, step_modification_flag, payment_deferral, delinquency_due_to_disaster,
+    borrower_assistance_status_code
+)
+SELECT 
+    lo.original_dti, lo.original_upb, lo.original_loan_term, lo.number_of_borrowers,
+    lo.original_ltv, lo.original_interest_rate, lo.maturity_date, lo.msa_code,
+    lo.mortgage_insurance_pct, lo.number_of_units, lo.property_valuation_method,
+    lo.first_payment_date, lo.original_cltv, lo.credit_score,
+    lo.pre_relief_refinance_loan_sequence, lo.program_indicator, lo.relief_refinance_indicator,
+    lo.interest_only_indicator, lo.mi_cancellation_indicator, lo.quarter_year AS origination_quarter,
+    lo.first_time_homebuyer_flag, lo.occupancy_status, lo.channel, lo.prepayment_penalty_flag,
+    lo.amortization_type, lo.property_state, lo.property_type, lo.postal_code, lo.loan_sequence_number,
+    lo.loan_purpose, lo.seller_name, lo.servicer_name, lo.super_conforming_flag, 
+    lp.estimated_loan_to_value, lp.zero_balance_removal_upb, lp.delinquent_accrued_interest,
+    lp.remaining_months_to_legal_maturity, lp.defect_settlement_date, lp.current_month_modification_cost,
+    lp.interest_bearing_upb, lp.current_actual_upb, lp.zero_balance_code, lp.zero_balance_effective_date,
+    lp.current_interest_rate, lp.current_non_interest_bearing_upb, lp.due_date_last_paid_installment,
+    lp.mi_recoveries, lp.net_sale_proceeds, lp.non_mi_recoveries, lp.total_expenses, lp.legal_costs,
+    lp.maintenance_preservation_costs, lp.taxes_and_insurance, lp.miscellaneous_expenses,
+    lp.actual_loss_calculation, lp.cumulative_modification_cost, lp.monthly_reporting_period,
+    lp.loan_age, lp.quarter_year AS performance_quarter, lp.current_loan_delinquency_status,
+    lp.modification_flag, lp.step_modification_flag, lp.payment_deferral, lp.delinquency_due_to_disaster,
+    lp.borrower_assistance_status_code
+FROM public.loan_origination lo
+JOIN public.loan_performance lp  
+ON lo.loan_sequence_number = lp.loan_sequence_number
+WHERE lp.quarter_year = '2020Q3' 
+AND (lp.loan_sequence_number, lp.monthly_reporting_period) IN (
+    -- Select only the most recent monthly record per loan for Q3
+    SELECT loan_sequence_number, MAX(monthly_reporting_period)
+    FROM public.loan_performance
+    WHERE quarter_year = '2020Q3'
+    GROUP BY loan_sequence_number
+)
+ORDER BY lo.loan_sequence_number;
+
+-- ✅ Repeat for Q4 2020 (October - December)
+INSERT INTO merged_loan_data (
+    original_dti, original_upb, original_loan_term, number_of_borrowers,
+    original_ltv, original_interest_rate, maturity_date, msa_code,
+    mortgage_insurance_pct, number_of_units, property_valuation_method,
+    first_payment_date, original_cltv, credit_score,
+    pre_relief_refinance_loan_sequence, program_indicator, relief_refinance_indicator,
+    interest_only_indicator, mi_cancellation_indicator, origination_quarter,
+    first_time_homebuyer_flag, occupancy_status, channel, prepayment_penalty_flag,
+    amortization_type, property_state, property_type, postal_code, loan_sequence_number,
+    loan_purpose, seller_name, servicer_name, super_conforming_flag, 
+    estimated_loan_to_value, zero_balance_removal_upb, delinquent_accrued_interest,
+    remaining_months_to_legal_maturity, defect_settlement_date, current_month_modification_cost,
+    interest_bearing_upb, current_actual_upb, zero_balance_code, zero_balance_effective_date,
+    current_interest_rate, current_non_interest_bearing_upb, due_date_last_paid_installment,
+    mi_recoveries, net_sale_proceeds, non_mi_recoveries, total_expenses, legal_costs,
+    maintenance_preservation_costs, taxes_and_insurance, miscellaneous_expenses,
+    actual_loss_calculation, cumulative_modification_cost, monthly_reporting_period,
+    loan_age, performance_quarter, current_loan_delinquency_status,
+    modification_flag, step_modification_flag, payment_deferral, delinquency_due_to_disaster,
+    borrower_assistance_status_code
+)
+SELECT 
+    lo.original_dti, lo.original_upb, lo.original_loan_term, lo.number_of_borrowers,
+    lo.original_ltv, lo.original_interest_rate, lo.maturity_date, lo.msa_code,
+    lo.mortgage_insurance_pct, lo.number_of_units, lo.property_valuation_method,
+    lo.first_payment_date, lo.original_cltv, lo.credit_score,
+    lo.pre_relief_refinance_loan_sequence, lo.program_indicator, lo.relief_refinance_indicator,
+    lo.interest_only_indicator, lo.mi_cancellation_indicator, lo.quarter_year AS origination_quarter,
+    lo.first_time_homebuyer_flag, lo.occupancy_status, lo.channel, lo.prepayment_penalty_flag,
+    lo.amortization_type, lo.property_state, lo.property_type, lo.postal_code, lo.loan_sequence_number,
+    lo.loan_purpose, lo.seller_name, lo.servicer_name, lo.super_conforming_flag, 
+    lp.estimated_loan_to_value, lp.zero_balance_removal_upb, lp.delinquent_accrued_interest,
+    lp.remaining_months_to_legal_maturity, lp.defect_settlement_date, lp.current_month_modification_cost,
+    lp.interest_bearing_upb, lp.current_actual_upb, lp.zero_balance_code, lp.zero_balance_effective_date,
+    lp.current_interest_rate, lp.current_non_interest_bearing_upb, lp.due_date_last_paid_installment,
+    lp.mi_recoveries, lp.net_sale_proceeds, lp.non_mi_recoveries, lp.total_expenses, lp.legal_costs,
+    lp.maintenance_preservation_costs, lp.taxes_and_insurance, lp.miscellaneous_expenses,
+    lp.actual_loss_calculation, lp.cumulative_modification_cost, lp.monthly_reporting_period,
+    lp.loan_age, lp.quarter_year AS performance_quarter, lp.current_loan_delinquency_status,
+    lp.modification_flag, lp.step_modification_flag, lp.payment_deferral, lp.delinquency_due_to_disaster,
+    lp.borrower_assistance_status_code
+FROM public.loan_origination lo
+JOIN public.loan_performance lp  
+ON lo.loan_sequence_number = lp.loan_sequence_number
+WHERE lp.quarter_year = '2020Q4' 
+AND (lp.loan_sequence_number, lp.monthly_reporting_period) IN (
+    -- Select only the most recent monthly record per loan for Q4
+    SELECT loan_sequence_number, MAX(monthly_reporting_period)
+    FROM public.loan_performance
+    WHERE quarter_year = '2020Q4'
+    GROUP BY loan_sequence_number
+)
+ORDER BY lo.loan_sequence_number;
+
+-- ✅ Check if Data Inserted
+SELECT COUNT(*) FROM merged_loan_data;
+
+SELECT 
+    performance_quarter, COUNT(*) 
+FROM merged_loan_data 
+GROUP BY performance_quarter;
+
+SELECT quarter_year, COUNT(*) 
+FROM loan_performance 
+GROUP BY quarter_year;
+
+SELECT COUNT(DISTINCT loan_sequence_number) FROM merged_loan_data;
+SELECT loan_sequence_number, COUNT(*) AS performance_count
+FROM merged_loan_data
+GROUP BY loan_sequence_number
+HAVING COUNT(*) > 1;
+
+SELECT performance_quarter, COUNT(*) 
+FROM merged_loan_data 
+GROUP BY performance_quarter;
+
+
+SELECT COUNT(*), COUNT(DISTINCT loan_sequence_number) 
+FROM merged_loan_data;
+
+SELECT performance_quarter, COUNT(DISTINCT loan_sequence_number) 
+FROM merged_loan_data
+GROUP BY performance_quarter
+ORDER BY performance_quarter;
+
+-- Check if any loans have more than four records
+SELECT loan_sequence_number, COUNT(*) AS num_performance_records
+FROM merged_loan_data
+GROUP BY loan_sequence_number
+HAVING COUNT(*) > 4
+ORDER BY num_performance_records DESC
+LIMIT 10;
+
+SELECT loan_sequence_number, performance_quarter, COUNT(*) AS records_per_quarter
+FROM merged_loan_data
+GROUP BY loan_sequence_number, performance_quarter
+HAVING COUNT(*) > 1;
+
+SELECT loan_sequence_number, performance_quarter, COUNT(*) AS records_per_quarter
+FROM merged_loan_data
+GROUP BY loan_sequence_number, performance_quarter
+HAVING COUNT(*) > 1
+ORDER BY records_per_quarter DESC;
+
+SELECT COUNT(*) FROM loan_origination;
+
+SELECT COUNT(DISTINCT loan_sequence_number) FROM merged_loan_data;
+
+
+-- Create a new column to look at loan delinquency status 
+SELECT 
+    loan_sequence_number,
+    CASE 
+        WHEN current_loan_delinquency_status::int >= 3 THEN 1  -- 90+ days late
+        WHEN zero_balance_code IN (3, 6, 9) THEN 1  -- Foreclosure, Charge-off, Non-performing sale
+        ELSE 0
+    END AS is_defaulted
+FROM merged_loan_data;
+
+-- Create indexes to run data faster
+CREATE INDEX idx_loan_seq ON merged_loan_data(loan_sequence_number);
+CREATE INDEX idx_perf_quarter ON merged_loan_data(performance_quarter);
+CREATE INDEX idx_monthly_reporting ON merged_loan_data(monthly_reporting_period);
+
+
