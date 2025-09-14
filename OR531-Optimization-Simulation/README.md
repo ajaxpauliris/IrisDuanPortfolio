@@ -23,12 +23,13 @@ The projects emphasized building mathematical models, solving them with analytic
 
 ## 📂 Repository Structure
 
-OR531-Projects
-- Project_5/     # Early decision analysis models (value functions, trade-offs)
-- Project_7/     # Monte Carlo simulation of uncertain costs/yields
-- Project_9/     # Optimization models for resource allocation
-- Project_10/    # Multi-criteria decision framework
-- Final_Exam/    # Integrated modeling case with simulation + optimization
+## OR531-Projects
+
+- **Project 5:**     Early decision analysis models (value functions, trade-offs)
+- **Project 7:**     Monte Carlo simulation of uncertain costs/yields
+- **Project 9:**     Optimization models for resource allocation
+- **Project 10:**    Multi-criteria decision framework
+- **Final Exam:**    Integrated modeling case with simulation + optimization
 
 
 
