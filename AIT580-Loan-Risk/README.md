@@ -15,3 +15,14 @@ SQL (PostgreSQL), Python (pandas, NumPy, scikit-learn), Matplotlib, Seaborn, Git
 - **/code/** – Python scripts and notebooks for data cleaning, feature engineering, and modeling
 - **/sql/** – schema creation and query scripts
 - **/outputs/** – charts, confusion matrices, and final PDF write-up
+
+
+## 🧠 Key Skills Demonstrated
+- Data engineering: transforming messy raw data into usable modeling datasets
+- Predictive modeling: training, tuning, and evaluating ML classifiers
+- Business translation: turning technical results into insights for credit risk teams
+- Reproducibility: organizing work for reuse and future enhancement
+
+---
+
+📌 **Capstone Relevance:** This project provides a foundation for advanced credit risk modeling and stress-testing work, aligning with my career focus in ALM, FTP, and quantitative finance.
