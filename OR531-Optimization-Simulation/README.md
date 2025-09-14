@@ -19,7 +19,7 @@ The projects emphasized building mathematical models, solving them with analytic
 - **Final Exam Project:** Integrated Monte Carlo simulation, optimization, and sensitivity analysis into a cohesive case study.
 
 ## 📂 Repository Structure
-# OR 531 – Analytics and Modeling Projects
+### OR 531 – Analytics and Modeling Projects
 
 - **Project 5:**     Early decision analysis models (value functions, trade-offs)
 - **Project 7:**     Monte Carlo simulation of uncertain costs/yields
