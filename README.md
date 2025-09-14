@@ -59,7 +59,7 @@ The projects below highlight my expertise in **quantitative finance, machine lea
 ---
 
 ## 📬 Contact
-💼 [LinkedIn]((https://www.linkedin.com/in/ijduan/)) | 📧 irisd123@gmail.com
+💼 [LinkedIn][(https://www.linkedin.com/in/ijduan/)] | 📧 irisd123@gmail.com
 
 ---
 
